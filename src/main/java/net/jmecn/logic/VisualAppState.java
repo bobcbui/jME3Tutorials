@@ -117,4 +117,10 @@ public class VisualAppState implements AppState {
         initialized = false;
     }
 
+    @Override
+    public String getId() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getId'");
+    }
+
 }

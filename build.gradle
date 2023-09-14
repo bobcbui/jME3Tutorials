@@ -1,59 +1,119 @@
-apply plugin: 'java'
-
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
-
-[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
-
-repositories {
-    jcenter()
+plugins {
+    id 'application'
+    id 'java'
+    id "de.undercouch.download" version "5.1.0"
+    id 'idea'
+    id "io.github.0ffz.github-packages" version "1.2.1" // Plugin for anonymous inclusion of artifacts hosted in github package registry
 }
 
-// 定义jME3的组织与版本号。更新jME3依赖时，直接修改版本号即可。
-def jme3 = [g:'org.jmonkeyengine', v:'3.1.0-stable']
+description = 'Jmetutorials application'
+
+java {
+    sourceCompatibility = '17'
+    targetCompatibility = '17'
+}
+
+ext.jmonkeyengineVersion = '3.6.1-stable'
+
+mainClassName = 'com.ooqn.Jmetutorials'
+if (!hasProperty('mainClass')) {
+    ext.mainClass = mainClassName
+}
+jar.manifest.attributes('Main-Class': mainClassName)
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
 
 dependencies {
-    // 将libs文件夹下所有jar文件添加到classpath
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    // You can read more about how to add dependencies here:
+    //   https://docs.gradle.org/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
 
-    // Logger组件
-    compile 'org.slf4j:slf4j-api:1.7.21'
-    compile 'org.slf4j:jcl-over-slf4j:1.7.21'
-    
-    /**
-     * jMonkeyEngine3
-     */
-    // jME3桌面开发核心组件
-    compile "$jme3.g:jme3-core:$jme3.v"
-    compile "$jme3.g:jme3-desktop:$jme3.v"
-    compile "$jme3.g:jme3-lwjgl:$jme3.v"
-    compile "$jme3.g:jme3-jogl:$jme3.v"
-    // 水面、粒子特效等
-    compile "$jme3.g:jme3-effects:$jme3.v"
-    // 支持ogg音频格式
-    compile "$jme3.g:jme3-jogg:$jme3.v"
-    // 支持blend模型文件
-    compile "$jme3.g:jme3-blender:$jme3.v"
-    compile "$jme3.g:jme3-plugins:$jme3.v"
-    // 支持高度图地形
-    compile "$jme3.g:jme3-terrain:$jme3.v"
-    // 支持bullet 3D物理引擎
-    compile "$jme3.g:jme3-bullet:$jme3.v"
-    compile "$jme3.g:jme3-bullet-native:$jme3.v"
+    implementation 'org.jmonkeyengine:jme3-core:' + jmonkeyengineVersion
+    implementation 'org.jmonkeyengine:jme3-desktop:' + jmonkeyengineVersion
+    runtimeOnly 'org.jmonkeyengine:jme3-jogg:' + jmonkeyengineVersion
+    runtimeOnly 'org.jmonkeyengine:jme3-plugins:' + jmonkeyengineVersion
 
-    // 支持dyn4j 2D物理引擎
-    //compile 'org.dyn4j:dyn4j:3.2.3'
+    implementation 'org.jmonkeyengine:jme3-effects:' + jmonkeyengineVersion
+    implementation 'org.jmonkeyengine:jme3-terrain:' + jmonkeyengineVersion
+    implementation 'org.jmonkeyengine:jme3-niftygui:' + jmonkeyengineVersion
+    implementation 'org.jmonkeyengine:jme3-jbullet:' + jmonkeyengineVersion
+    runtimeOnly 'org.jmonkeyengine:jme3-lwjgl3:' + jmonkeyengineVersion
+
+    implementation 'com.simsilica:lemur:1.16.0'
+    implementation 'com.simsilica:lemur-proto:1.13.0'
+}
+
+distZip {
+    //having a degenerate folder within the dist zip complicates generating the other zips
+    eachFile { file ->
+        String path = file.relativePath
+        file.setPath(path.substring(path.indexOf("/") + 1, path.length()))
+    }
+    includeEmptyDirs(false)
+}
+
+//See https://api.adoptium.net/v3/assets/feature_releases/11/ga?image_type=jre for jre urls
+def windowsJreUrl = "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.6%2B10/OpenJDK17U-jre_x64_windows_hotspot_17.0.6_10.zip"
+
+
+
+task downloadWindowsJre(type: Download) {
+    src windowsJreUrl
+    dest new File(buildDir, '/jres/windowsJre.zip')
+    overwrite false
+}
+
+task downloadAndUnzipWindowsJre(dependsOn: downloadWindowsJre, type: Copy) {
+    from zipTree(downloadWindowsJre.dest)
+    into "${buildDir}/jres/windowsJre/"
+    includeEmptyDirs(false)
+    filesMatching("**") {
+        it.path = it.path.replaceAll("^[a-zA-Z0-9.+-]*[/\\\\]", "jre/") //rename the top level to something standard so the rest of the script will be easier
+    }
+}
+
+task buildWindowsDistribution(dependsOn: [distZip, downloadAndUnzipWindowsJre], type: Copy)
+{
+    group 'distribution'
+    from files("${projectDir}/scripts/desktopDeployment/Jmetutorials.bat"), zipTree(distZip.archiveFile), "${buildDir}/jres/windowsJre"
+    into new File(buildDir, 'distributions/Jmetutorials-windows')
+    includeEmptyDirs false
+    exclude 'bin/**' //we are adding our own run scripts, exclude the ones coming from distZip
+}
+
+task zipWindowsDistribution( dependsOn:buildWindowsDistribution, type: Zip) {
+    group 'distribution'
+    archiveFileName = "Jmetutorials-windows.zip"
+    destinationDirectory = file("$buildDir/distributions")
+    from "$buildDir/distributions/Jmetutorials-windows"
+}
+
+
+task buildAllDistributions{
+    group 'distribution'
+    dependsOn 'zipWindowsDistribution'
     
-    /**
-     * Lemur用于制作jME3的GUI
-     */
-    compile "com.simsilica:lemur:1.10.1"
-    compile "com.simsilica:lemur-proto:1.9.1"
-    // Lemur支持使用 groovy脚本编写的样式文件，(可选)。
-    compile 'org.codehaus.groovy:groovy-all:2.4.10'
-    
-    /**
-     * JUnit单元测试
-     */
-    testCompile 'junit:junit:4.12'
+}
+
+// cleanup tasks
+clean.dependsOn('cleanDLLs', 'cleanDyLibs', 'cleanLogs', 'cleanSOs')
+task cleanDLLs(type: Delete) {
+    delete fileTree(dir: '.', include: '*.dll')
+}
+task cleanDyLibs(type: Delete) {
+    delete fileTree(dir: '.', include: '*.dylib')
+}
+task cleanLogs(type: Delete) {
+    delete fileTree(dir: '.', include: 'hs_err_pid*.log')
+}
+task cleanSOs(type: Delete) {
+    delete fileTree(dir: '.', include: '*.so')
+}
+
+task fund(){
+    doLast {
+       java.awt.Desktop.desktop.browse "https://start.jmonkeyengine.org/#!funding=JME_DESKTOP,JME_EFFECTS,JME_TERRAIN,JME_NIFTY,LEMUR,JME_JBULLET".toURI()
+    }
 }
