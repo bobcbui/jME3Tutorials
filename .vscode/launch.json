@@ -6,6 +6,83 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TestRPG2",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.game.TestRPG2",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "TestRPG",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.game.TestRPG",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "FakeCursor",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.gui.FakeCursor",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloPicture",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.gui.HelloPicture",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloGUI",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.gui.HelloGUI",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloLoop",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.logic.HelloLoop",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "TestJ3M",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.material.TestJ3M",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloSky",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.outscene.HelloSky",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "MyGame",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.thread.MyGame",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloBoundingSphere",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.collision.HelloBoundingSphere",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "Main",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.physics3d.jaime.Main",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
             "name": "HelloSkeleton",
             "request": "launch",
             "mainClass": "com.ooqn.jme.HelloSkeleton",

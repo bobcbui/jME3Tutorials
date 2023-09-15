@@ -1,9 +1,7 @@
 package com.ooqn.jme.game;
 
-import com.jme3.animation.AnimChannel;
-import com.jme3.animation.AnimControl;
-import com.jme3.animation.AnimEventListener;
-import com.jme3.animation.LoopMode;
+import com.jme3.anim.AnimComposer;
+import com.jme3.anim.util.AnimMigrationUtils;
 import com.jme3.app.ChaseCameraAppState;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.StatsAppState;
@@ -26,7 +24,6 @@ import com.jme3.scene.Spatial;
 import com.jme3.scene.debug.Arrow;
 import com.jme3.scene.shape.Quad;
 import com.jme3.scene.shape.Sphere;
-
 import com.ooqn.jme.logic.FloatControl;
 
 /**
@@ -35,25 +32,27 @@ import com.ooqn.jme.logic.FloatControl;
  * @author yanmaoyuan
  *
  */
-public class TestRPG extends SimpleApplication implements ActionListener, AnimEventListener, Observer {
+public class TestRPG2 extends SimpleApplication implements ActionListener, Observer {
 
     public static void main(String[] args) {
-        TestRPG app = new TestRPG();
+        TestRPG2 app = new TestRPG2();
         app.start();
     }
 
     // 平台
     private Spatial floor;
+    
     // 标志
     private Spatial flag;
 
     private MotionControl motionControl;
 
-    private AnimChannel animChannel;
+    private AnimComposer animComposer;
+
     private boolean isWalking = false;
     private boolean isRunning = false;
 
-    public TestRPG() {
+    public TestRPG2() {
         super(new StatsAppState(), new ChaseCameraAppState(), new AiAppState(), new LightAppState());
     }
     
@@ -73,8 +72,7 @@ public class TestRPG extends SimpleApplication implements ActionListener, AnimEv
         ChaseCameraAppState chaseCam = stateManager.getState(ChaseCameraAppState.class);
 
         // 仰角最小10°，最大90°，默认30°
-        chaseCam.setMinVerticalRotation(FastMath.DEG_TO_RAD * 10);
-        chaseCam.setDefaultVerticalRotation(FastMath.DEG_TO_RAD * 30);
+        chaseCam.setDefaultVerticalRotation(FastMath.DEG_TO_RAD * 50);
 
         // 摄像机到观察点的距离，最小5f，最大30f，默认5f
         chaseCam.setMinDistance(5f);
@@ -122,7 +120,10 @@ public class TestRPG extends SimpleApplication implements ActionListener, AnimEv
      */
     private Spatial loadJaime() {
         // 加载模型
-        Node jaime = (Node) assetManager.loadModel("Models/Jaime/Jaime.j3o");
+        Spatial jaime =  assetManager.loadModel("Models/Jaime/Jaime.j3o");
+        AnimMigrationUtils.migrate(jaime);
+        animComposer = jaime.getControl(AnimComposer.class);
+        animComposer.setCurrentAction("Idle");
         jaime.scale(2);
         rootNode.attachChild(jaime);
         jaime.setShadowMode(ShadowMode.Cast);
@@ -130,21 +131,14 @@ public class TestRPG extends SimpleApplication implements ActionListener, AnimEv
         // 创造一个空心节点，作为摄像机的交点
         Node camPiovt = new Node("CamPiovt");
         camPiovt.move(0, 1f, 0);
-        jaime.attachChild(camPiovt);
-
+        ((Node)jaime).attachChild(camPiovt);
+        
         stateManager.getState(ChaseCameraAppState.class).setTarget(camPiovt);
         stateManager.getState(AiAppState.class).setPlayer(jaime);
         
         // 添加一个运动组件
         jaime.addControl(motionControl = new MotionControl(4.0f));
         motionControl.setObserver(this);
-
-        AnimControl animControl = jaime.getControl(AnimControl.class);
-        animControl.addListener(this);
-
-        // 播放动画
-        animChannel = animControl.createChannel();
-        animChannel.setAnim("Idle");
 
         return jaime;
     }
@@ -201,11 +195,6 @@ public class TestRPG extends SimpleApplication implements ActionListener, AnimEv
         /**
          * 若Jaime已经处于JumpStart/Jumping/JumpEnd状态，就不要再做其他动作了。
          */
-        // 查询当前正在播放的动画
-        String curAnim = animChannel.getAnimationName();
-        if (curAnim != null && curAnim.startsWith("Jump")) {
-            return;
-        }
 
         if (isPressed) {
             if ("LeftClick".equals(name)) {
@@ -217,26 +206,19 @@ public class TestRPG extends SimpleApplication implements ActionListener, AnimEv
                 } else {
                 	motionControl.setWalkSpeed(1.5f);
                 }
-                
                 // 播放“起跳”动画
-                animChannel.setAnim("JumpStart");
-                animChannel.setLoopMode(LoopMode.DontLoop);
-                animChannel.setSpeed(1.5f);
+                animComposer.setCurrentAction("JumpStart",AnimComposer.DEFAULT_LAYER, false);
             } else if ("Run".equals(name)) {
             	isRunning = !isRunning;
             	
             	if (isRunning) {
                 	motionControl.setWalkSpeed(1.5f);
-                	if (curAnim.equals("Walk")) {
-                		animChannel.setAnim("Run");
-                		animChannel.setSpeed(2f);
-                	}
+                    animComposer.setCurrentAction("Run",AnimComposer.DEFAULT_LAYER, false);
                 } else {
-                	motionControl.setWalkSpeed(1.0f);
-                	if (curAnim.equals("Run")) {
-                		animChannel.setAnim("Walk");
-                		animChannel.setSpeed(2f);
-                	}
+                    motionControl.setWalkSpeed(1.0f);
+                    animComposer.getAction("Walk");
+                    animComposer.setCurrentAction("Walk", AnimComposer.DEFAULT_LAYER, false);
+                    
                 }
             	
             }
@@ -277,67 +259,25 @@ public class TestRPG extends SimpleApplication implements ActionListener, AnimEv
         if (!isWalking) {
             isWalking = true;
             if (isRunning) {
-            	animChannel.setAnim("Run");
+            	animComposer.setCurrentAction("Run");
             } else {
-            	animChannel.setAnim("Walk");
+                animComposer.setGlobalSpeed(10);
+            	animComposer.setCurrentAction("Walk");
             }
-            animChannel.setSpeed(2.0f);
         }
     }
 
     @Override
     public void onReachTarget() {
-        // 恢复行走速度
-        String curAnim = animChannel.getAnimationName();
-        if (curAnim != null && curAnim.startsWith("Jump")) {
-            if (isRunning) {
-            	motionControl.setWalkSpeed(1.5f);
-            } else {
-            	motionControl.setWalkSpeed(1.0f);
-            }
+        if (isRunning) {
+            motionControl.setWalkSpeed(1.5f);
+        } else {
+            motionControl.setWalkSpeed(1.0f);
         }
-
         // 到达目标点，把动画改为Idle
-        animChannel.setAnim("Idle");
-        flag.removeFromParent();
+        animComposer.setCurrentAction("Idle");
         isWalking = false;
 
     }
 
-    /**
-     * 动画事件监听器
-     */
-    @Override
-    public void onAnimCycleDone(AnimControl control, AnimChannel channel, String animName) {
-        if ("JumpStart".equals(animName)) {
-            // “起跳”动作结束后，紧接着播放“着地”动画。
-            channel.setAnim("JumpEnd");
-            channel.setLoopMode(LoopMode.DontLoop);
-            channel.setSpeed(1.5f);
-
-        } else if ("JumpEnd".equals(animName)) {
-            if (isRunning) {
-            	motionControl.setWalkSpeed(1.5f);
-            } else {
-            	motionControl.setWalkSpeed(1.0f);
-            }
-            
-            // “着地”后，根据按键状态来播放“行走”或“闲置”动画。
-            if (isWalking) {
-            	if (isRunning) {
-            		channel.setAnim("Run");
-            		channel.setSpeed(2f);
-            	} else {
-            		channel.setAnim("Walk");
-            		channel.setSpeed(2f);
-            	}
-            } else {
-                channel.setAnim("Idle");
-            }
-        }
-    }
-
-    @Override
-    public void onAnimChange(AnimControl control, AnimChannel channel, String animName) {
-    }
 }
