@@ -74,8 +74,7 @@ task downloadAndUnzipWindowsJre(dependsOn: downloadWindowsJre, type: Copy) {
     }
 }
 
-task buildWindowsDistribution(dependsOn: [distZip, downloadAndUnzipWindowsJre], type: Copy)
-{
+task buildWindowsDistribution(dependsOn: [distZip, downloadAndUnzipWindowsJre], type: Copy){
     group 'distribution'
     from files("${projectDir}/scripts/desktopDeployment/Jmetutorials.bat"), zipTree(distZip.archiveFile), "${buildDir}/jres/windowsJre"
     into new File(buildDir, 'distributions/Jmetutorials-windows')

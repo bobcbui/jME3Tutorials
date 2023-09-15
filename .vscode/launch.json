@@ -6,9 +6,100 @@
     "configurations": [
         {
             "type": "java",
+            "name": "HelloSkeleton",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloSkeleton",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloShape",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloShape",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloNode",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloNode",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloModel",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloModel",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloMesh",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloMesh",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloMaterial",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloMaterial",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloLight",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloLight",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloJME3",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloJME3",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloInput",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloInput",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloControl",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloControl",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloAudio",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloAudio",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloAppState2",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloAppState2",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
+            "name": "HelloAppState",
+            "request": "launch",
+            "mainClass": "com.ooqn.jme.HelloAppState",
+            "projectName": "Jmetutorials"
+        },
+        {
+            "type": "java",
             "name": "HelloAnimation",
             "request": "launch",
-            "mainClass": "net.jmecn.HelloAnimation",
+            "mainClass": "com.ooqn.jme.HelloAnimation",
             "projectName": "Jmetutorials"
         },
         {
