@@ -53,7 +53,7 @@ public class TestRPG2 extends SimpleApplication implements ActionListener, Obser
     private boolean isRunning = false;
 
     public TestRPG2() {
-        super(new StatsAppState(), new ChaseCameraAppState(), new AiAppState(), new LightAppState());
+        super(new StatsAppState(), new ChaseCameraAppState(), new LightAppState());
     }
     
     @Override
@@ -71,7 +71,7 @@ public class TestRPG2 extends SimpleApplication implements ActionListener, Obser
         // 设置跟踪相机的参数
         ChaseCameraAppState chaseCam = stateManager.getState(ChaseCameraAppState.class);
 
-        // 仰角最小10°，最大90°，默认30°
+        // 仰角 10° ，90° ，30° ， 50°
         chaseCam.setDefaultVerticalRotation(FastMath.DEG_TO_RAD * 50);
 
         // 摄像机到观察点的距离，最小5f，最大30f，默认5f
@@ -82,7 +82,7 @@ public class TestRPG2 extends SimpleApplication implements ActionListener, Obser
         chaseCam.setInvertVerticalAxis(true);
         chaseCam.setInvertHorizontalAxis(true);
 
-        // 鼠标右键触发旋转
+        // 鼠标右键触发旋转，不加参数表示不能旋转摄像机
         chaseCam.setToggleRotationTrigger();
 
         stateManager.attach(chaseCam);
@@ -134,7 +134,6 @@ public class TestRPG2 extends SimpleApplication implements ActionListener, Obser
         ((Node)jaime).attachChild(camPiovt);
         
         stateManager.getState(ChaseCameraAppState.class).setTarget(camPiovt);
-        stateManager.getState(AiAppState.class).setPlayer(jaime);
         
         // 添加一个运动组件
         jaime.addControl(motionControl = new MotionControl(4.0f));
