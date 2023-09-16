@@ -5,9 +5,11 @@
 /*.dll
 /*.dylib
 /*.so
+
+# VSCODE
 /bin/
 
-#Although most of the .idea directory should not be committed there is a legitimate purpose for committing run configurations
+# IDEA
 /.idea/
 !/.idea/runConfigurations/
 
