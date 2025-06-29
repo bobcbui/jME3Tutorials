@@ -13,15 +13,23 @@ java {
     targetCompatibility = '17'
 }
 
-ext.jmonkeyengineVersion = '3.6.1-stable'
+ext.jmonkeyengineVersion = '3.7.0-stable'
 
-mainClassName = 'com.ooqn.Jmetutorials'
-if (!hasProperty('mainClass')) {
-    ext.mainClass = mainClassName
+// 使用 Gradle 8.5 推荐的 Application 插件 DSL
+application {
+    mainClass.set('com.ooqn.Jmetutorials')
 }
-jar.manifest.attributes('Main-Class': mainClassName)
+
+// 以下配置已过时，因使用新的 application.mainClass 进行主类声明
+// mainClassName = 'com.ooqn.Jmetutorials'
+// if (!hasProperty('mainClass')) {
+//     ext.mainClass = mainClassName
+// }
+// jar.manifest.attributes('Main-Class': mainClassName)
 
 repositories {
+    // 阿里云镜像
+    maven { url 'https://maven.aliyun.com/repository/public' }
     mavenCentral()
     mavenLocal()
 }
@@ -43,6 +51,9 @@ dependencies {
 
     implementation 'com.simsilica:lemur:1.16.0'
     implementation 'com.simsilica:lemur-proto:1.13.0'
+
+    // 添加 Groovy JSR223 脚本引擎依赖
+    implementation 'org.codehaus.groovy:groovy-jsr223:3.0.17'
 }
 
 distZip {
